@@ -90,12 +90,14 @@ export function Navbar({ locale, nav, a11y, formNote }: NavbarProps) {
             {nav.cta}
           </Button>
           <IconButton
-            aria-label={a11y.menuOpen}
+            aria-label={menuOpen ? a11y.menuClose : a11y.menuOpen}
             aria-haspopup="dialog"
             aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(true)}
+            onClick={() => setMenuOpen((prev) => !prev)}
             className="lg:hidden"
           >
+            {/* Same icon whether the menu is open or closed: it's one toggle,
+                not two separate controls wearing different faces. */}
             <Menu className="size-6" aria-hidden="true" />
           </IconButton>
         </div>
@@ -106,12 +108,9 @@ export function Navbar({ locale, nav, a11y, formNote }: NavbarProps) {
         onClose={() => setMenuOpen(false)}
         items={items}
         title={a11y.menuTitle}
-        closeLabel={a11y.menuClose}
         ctaLabel={nav.cta}
         formNote={formNote}
         newTab={a11y.newTab}
-        themeLightLabel={a11y.themeLight}
-        themeDarkLabel={a11y.themeDark}
       />
     </header>
   );
