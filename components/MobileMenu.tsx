@@ -71,19 +71,22 @@ export function MobileMenu({ open, onClose, items, title, ctaLabel, formNote, ne
         <m.div key="mobile-menu" className="fixed inset-0 z-[60] lg:hidden">
           <m.div
             aria-hidden="true"
-            className="material-scrim absolute inset-0"
+            className="material-scrim absolute inset-x-0 bottom-0 top-16"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { duration: 0.2, ease: outCurve } }}
             exit={{ opacity: 0, transition: { duration: 0.2, ease: outCurve } }}
             onClick={onClose}
           />
+          {/* The scrim (and the card below) start under the header, not over
+              it: the bar — and the menu button that toggles this sheet —
+              stays fully visible and tappable the whole time it's open. */}
           <m.div
             ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-label={title}
             tabIndex={-1}
-            className="material-menu absolute inset-4 flex flex-col overflow-hidden rounded-[1.75rem] px-6 pb-6 pt-6 outline-none sm:inset-6"
+            className="material-menu absolute inset-x-4 bottom-4 top-20 flex flex-col overflow-hidden rounded-[1.75rem] px-6 pb-6 pt-6 outline-none sm:inset-x-6 sm:bottom-6 sm:top-24"
             style={{ touchAction: "pan-y" }}
             initial={{ x: "110%", opacity: 0 }}
             animate={{ x: 0, opacity: 1, transition: { x: springs.sheet, opacity: { duration: 0.15, ease: outCurve } } }}
