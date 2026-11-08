@@ -110,6 +110,8 @@ export function Navbar({ locale, nav, a11y, formNote }: NavbarProps) {
         ctaLabel={nav.cta}
         formNote={formNote}
         newTab={a11y.newTab}
+        themeLightLabel={a11y.themeLight}
+        themeDarkLabel={a11y.themeDark}
       />
     </header>
   );
