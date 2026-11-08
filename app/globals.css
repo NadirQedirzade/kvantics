@@ -1,0 +1,427 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* Design tokens                                                       */
+/* A sophisticated, restrained monochrome system: near-black text on    */
+/* near-white surfaces (and the reverse in dark mode), one accent blue  */
+/* used sparingly, and nothing else competing for attention. Light is   */
+/* the default experience; dark is a deliberate alternate palette, not  */
+/* an inversion. Components never hard-code a hex — only these tokens.  */
+/* ------------------------------------------------------------------ */
+@theme {
+  --color-bg: #ffffff; /* page foundation */
+  --color-surface: #f5f5f7; /* raised / alternating sections */
+  --color-elevated: #ffffff; /* menus, sheets — pop above surface via border + shadow */
+  --color-fg: #1d1d1f; /* primary text */
+  --color-fg-2: #6e6e73; /* secondary text */
+  --color-fg-3: #86868b; /* tertiary text / captions */
+  --color-blue: #2563ff; /* the one accent: Kvantics blue, used sparingly */
+  --color-blue-hover: #0d47d9;
+  --color-blue-2: #1d4ed8; /* blue for small text/links on light surfaces (6.7:1) */
+  --color-line: #d2d2d7; /* hairlines */
+  --color-line-strong: #b9b9c0;
+  --color-positive: #1d8a4a; /* status: open / completed — meaning, not decoration */
+
+  /* Neutral fills: hover/active backgrounds and soft chips. Always a
+     tint of the foreground color, never the accent — so a hover state
+     reads as "pressed", not as a colored highlight. */
+  --color-fill-1: rgb(0 0 0 / 0.035);
+  --color-fill-2: rgb(0 0 0 / 0.055);
+  --color-fill-3: rgb(0 0 0 / 0.08);
+
+  /* System font first (real SF on Apple devices); Inter Variable elsewhere. */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    "Inter Variable", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+
+  /* Easing tokens (strong curves; the built-in CSS easings are too weak for UI). */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --container-site: 75rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Theme-only tokens: raw CSS custom properties (not Tailwind colors)  */
+/* used directly by the material/overlay rules further below.          */
+/* ------------------------------------------------------------------ */
+:root {
+  --header-tint: rgb(255 255 255 / 0.72);
+  --header-edge: rgb(0 0 0 / 0.05);
+  --menu-bg: rgb(255 255 255 / 0.9);
+  --menu-border: rgb(0 0 0 / 0.08);
+  --menu-sheen: rgb(255 255 255 / 0.8);
+  --menu-shadow: rgb(0 0 0 / 0.14);
+  --sheet-bg: rgb(255 255 255 / 0.96);
+  --sheet-border: rgb(0 0 0 / 0.08);
+  --sheet-shadow: rgb(0 0 0 / 0.16);
+  --scrim: rgb(60 60 67 / 0.36);
+  color-scheme: light;
+}
+
+/* ------------------------------------------------------------------ */
+/* Dark theme. True near-black (not a tinted navy), matching macOS/iOS  */
+/* dark surfaces: #000 base, #0A0A0A panels, #1C1C1E for anything that  */
+/* needs to sit visibly above both.                                     */
+/* ------------------------------------------------------------------ */
+[data-theme="dark"] {
+  --color-bg: #000000;
+  --color-surface: #0a0a0a;
+  --color-elevated: #1c1c1e;
+  --color-fg: #f5f5f7;
+  --color-fg-2: #a1a1a6;
+  --color-fg-3: #6e6e73;
+  --color-blue: #2563ff;
+  --color-blue-hover: #4d81ff;
+  --color-blue-2: #6c95ff;
+  --color-line: rgb(255 255 255 / 0.14);
+  --color-line-strong: rgb(255 255 255 / 0.24);
+  --color-positive: #32c766;
+
+  --color-fill-1: rgb(255 255 255 / 0.06);
+  --color-fill-2: rgb(255 255 255 / 0.09);
+  --color-fill-3: rgb(255 255 255 / 0.12);
+
+  --header-tint: rgb(0 0 0 / 0.74);
+  --header-edge: rgb(255 255 255 / 0.05);
+  --menu-bg: rgb(28 28 30 / 0.88);
+  --menu-border: rgb(255 255 255 / 0.1);
+  --menu-sheen: rgb(255 255 255 / 0.06);
+  --menu-shadow: rgb(0 0 0 / 0.6);
+  --sheet-bg: rgb(10 10 10 / 0.96);
+  --sheet-border: rgb(255 255 255 / 0.1);
+  --sheet-shadow: rgb(0 0 0 / 0.7);
+  --scrim: rgb(0 0 0 / 0.55);
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+@layer base {
+  html {
+    scroll-padding-top: 6rem;
+    scrollbar-gutter: stable;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* Theme switch itself cross-fades surfaces and text smoothly. Scoped to
+     this one moment (a class the toggle adds and removes) so nothing else
+     on the page picks up an unwanted transition on first paint or on
+     unrelated state changes. */
+  .theme-transition,
+  .theme-transition * {
+    transition:
+      background-color 420ms var(--ease-out),
+      border-color 420ms var(--ease-out),
+      color 420ms var(--ease-out),
+      fill 420ms var(--ease-out),
+      stroke 420ms var(--ease-out),
+      box-shadow 420ms var(--ease-out) !important;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    overflow-wrap: break-word;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-blue-2);
+    outline-offset: 3px;
+  }
+  ::selection {
+    background: rgb(37 99 255 / 0.22);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Type scale. Confident but restrained: the display size tops out      */
+/* well short of edge-to-edge, tracking tightens only as much as each   */
+/* size needs, and weight never goes past 600 (semibold) — nothing on   */
+/* the page should feel shouted.                                        */
+/* ------------------------------------------------------------------ */
+@layer components {
+  .type-display {
+    font-size: clamp(2.5rem, 1.7rem + 3.6vw, 4.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+  }
+  .type-h1 {
+    font-size: clamp(2.125rem, 1.55rem + 2.7vw, 3.25rem);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+  }
+  .type-h2 {
+    font-size: clamp(1.625rem, 1.3rem + 1.5vw, 2.375rem);
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+  .type-h3 {
+    font-size: 1.1875rem;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+  }
+  .type-lead {
+    font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+    line-height: 1.55;
+    letter-spacing: -0.008em;
+    color: var(--color-fg-2);
+    font-weight: 400;
+  }
+  .type-body {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+  .type-small {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    letter-spacing: 0.002em;
+  }
+  .type-caption {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    letter-spacing: 0.012em;
+  }
+
+  .container-site {
+    margin-inline: auto;
+    width: 100%;
+    max-width: var(--container-site);
+    padding-inline: 1.5rem;
+  }
+  @media (min-width: 48rem) {
+    .container-site {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  /* -------------------------------------------------------------- */
+  /* Materials                                                       */
+  /* -------------------------------------------------------------- */
+  .header {
+    isolation: isolate;
+  }
+  /* The bar's material fades in with scroll (opacity only: cheap). */
+  .header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--header-tint);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    backdrop-filter: blur(20px) saturate(140%);
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out);
+  }
+  /* Scroll-edge effect instead of a hard divider line. */
+  .header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 1px;
+    background: var(--color-line);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out);
+  }
+  .header[data-scrolled="true"]::before,
+  .header[data-scrolled="true"]::after {
+    opacity: 1;
+  }
+
+  .material-menu {
+    background: var(--menu-bg);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--menu-border);
+    box-shadow:
+      inset 0 1px 0 var(--menu-sheen),
+      0 20px 40px -14px var(--menu-shadow);
+  }
+  .material-sheet {
+    background: var(--sheet-bg);
+    -webkit-backdrop-filter: blur(28px) saturate(140%);
+    backdrop-filter: blur(28px) saturate(140%);
+    border-left: 1px solid var(--sheet-border);
+    box-shadow: -24px 0 48px -16px var(--sheet-shadow);
+  }
+  .material-scrim {
+    background: var(--scrim);
+  }
+
+  /* -------------------------------------------------------------- */
+  /* Skip link                                                       */
+  /* -------------------------------------------------------------- */
+  .skip-link {
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background: var(--color-blue);
+    color: #fff;
+    font-weight: 600;
+    transform: translateY(-200%);
+  }
+  .skip-link:focus {
+    transform: none;
+  }
+
+  /* -------------------------------------------------------------- */
+  /* Motion                                                          */
+  /* -------------------------------------------------------------- */
+  @keyframes page-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .page-enter {
+    animation: page-in 320ms var(--ease-out) backwards;
+  }
+
+  /* Hero mark: a single, restrained stroke reveal. No pulsing, no glow. */
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes mark-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .hg-draw {
+    stroke-dasharray: 1;
+    animation: draw 1s var(--ease-out) var(--d, 0s) both;
+  }
+  .hg-fade {
+    animation: mark-in 0.6s var(--ease-out) var(--d, 0s) both;
+  }
+
+  /* Division motifs: one shared, flat line-art language. No node dots,
+     no network-diagram vertices — each is a small, specific pictogram. */
+  .motif-line {
+    fill: none;
+    stroke: var(--color-fg);
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .motif-dim {
+    stroke: var(--color-line-strong);
+  }
+  .motif-fill {
+    fill: var(--color-fg);
+  }
+  .motif-accent {
+    stroke: var(--color-blue);
+  }
+  .motif-accent-fill {
+    fill: var(--color-blue);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Accessibility media queries (Apple: reduce motion / transparency /  */
+/* increase contrast). Reduced motion keeps opacity, drops movement.   */
+/* ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: fade-in 200ms ease backwards;
+  }
+  .hg-draw,
+  .hg-fade {
+    animation: none;
+  }
+  .theme-transition,
+  .theme-transition * {
+    transition-duration: 1ms !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .header::before {
+    background: var(--color-bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .material-menu {
+    background: var(--color-elevated);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .material-sheet {
+    background: var(--color-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --color-line: #86868b;
+    --color-line-strong: #4a4a4d;
+    --color-fg-2: #3a3a3d;
+    --color-fg-3: #2c2c2e;
+  }
+  [data-theme="dark"] {
+    --color-line: rgb(255 255 255 / 0.4);
+    --color-line-strong: rgb(255 255 255 / 0.7);
+    --color-fg-2: #d1d1d6;
+    --color-fg-3: #e5e5ea;
+  }
+  .header::before {
+    background: var(--color-bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .header[data-scrolled="true"] {
+    border-bottom: 1px solid var(--color-line-strong);
+  }
+}
