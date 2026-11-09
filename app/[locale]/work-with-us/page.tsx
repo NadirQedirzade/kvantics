@@ -5,6 +5,7 @@ import { IconFeature } from "@/components/Features";
 import { FormButton } from "@/components/FormButton";
 import { PageHeader, Section, SectionHeading } from "@/components/Section";
 import { localeHref } from "@/lib/i18n";
+import { WORK_WITH_US_FORM_URL } from "@/lib/links";
 import { pageMetadata } from "@/lib/metadata";
 import { resolveLocale } from "@/lib/page";
 import { getDictionary } from "@/lib/translations";
@@ -23,7 +24,9 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
   return (
     <>
       <PageHeader title={work.title} lead={work.lead}>
-        <FormButton newTab={a11y.newTab}>{common.workWithUs}</FormButton>
+        <FormButton href={WORK_WITH_US_FORM_URL} newTab={a11y.newTab}>
+          {common.workWithUs}
+        </FormButton>
         <p className="type-caption basis-full text-fg-3">{common.formNote}</p>
       </PageHeader>
 
@@ -57,7 +60,9 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
         </h2>
         <p className="type-lead mx-auto mt-5 max-w-xl">{work.how.text}</p>
         <div className="mt-10 flex justify-center">
-          <FormButton newTab={a11y.newTab}>{common.workWithUs}</FormButton>
+          <FormButton href={WORK_WITH_US_FORM_URL} newTab={a11y.newTab}>
+            {common.workWithUs}
+          </FormButton>
         </div>
         <p className="type-caption mt-4 text-fg-3">{common.formNote}</p>
         <p className="type-small mt-14 text-fg-2">
