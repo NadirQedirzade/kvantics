@@ -8,6 +8,7 @@ import { HeroGraphic } from "@/components/HeroGraphic";
 import { Section, SectionHeading } from "@/components/Section";
 import { divisionMeta } from "@/lib/divisions";
 import { localeHref } from "@/lib/i18n";
+import { WORK_WITH_US_FORM_URL } from "@/lib/links";
 import { pageMetadata } from "@/lib/metadata";
 import { resolveLocale } from "@/lib/page";
 import { getDictionary } from "@/lib/translations";
@@ -114,7 +115,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <p className="type-body mt-4 text-fg-2">{home.business.text}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <FormButton newTab={a11y.newTab}>{common.workWithUs}</FormButton>
+            <FormButton href={WORK_WITH_US_FORM_URL} newTab={a11y.newTab}>
+              {common.workWithUs}
+            </FormButton>
             <Button href={localeHref(locale, "/work-with-us")} variant="ghost" size="lg">
               {home.business.more}
             </Button>
