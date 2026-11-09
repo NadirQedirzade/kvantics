@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { localeHref, type Locale } from "@/lib/i18n";
-import { FORM_URL } from "@/lib/links";
+import { FORM_URL, WORK_WITH_US_FORM_URL } from "@/lib/links";
 import type { Dictionary } from "@/lib/translations";
 
 const linkClass =
@@ -45,9 +45,12 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         <div>
           <h2 className="type-small font-semibold text-fg">{dict.footer.involved}</h2>
           <ul className="mt-3">
-            {[dict.common.joinKvantics, dict.common.workWithUs].map((label) => (
+            {[
+              { label: dict.common.joinKvantics, href: FORM_URL },
+              { label: dict.common.workWithUs, href: WORK_WITH_US_FORM_URL },
+            ].map(({ label, href }) => (
               <li key={label}>
-                <a href={FORM_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                <a href={href} target="_blank" rel="noopener noreferrer" className={linkClass}>
                   {label}
                   <span className="sr-only"> {dict.a11y.newTab}</span>
                 </a>
